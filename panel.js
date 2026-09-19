@@ -9,10 +9,15 @@
 
 const STYLE_ID = 'prefill-bridge-style';
 const CARD_ID = 'prefill-bridge-card';
+const BODY_ID = 'prefill-bridge-body';
 
 const CSS = `
 .pb-card{border:1px solid var(--SmartThemeBorderColor,#555);border-radius:8px;margin:6px 0;padding:8px;font-size:12px;background:var(--SmartThemeBlurTintColor,rgba(0,0,0,.15))}
 .pb-card h4{margin:0 0 6px;font-size:13px;display:flex;justify-content:space-between;align-items:center;gap:6px}
+.pb-card h4 .pb-title{display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none;flex:1 1 auto}
+.pb-card h4 .pb-title:hover{opacity:.85}
+.pb-caret{display:inline-block;width:12px;text-align:center;font-size:10px;opacity:.8}
+.pb-body{display:flex;flex-direction:column}
 .pb-row{display:flex;align-items:center;gap:6px;margin:4px 0}
 .pb-row label{flex:0 0 auto}
 .pb-row.pb-col{flex-direction:column;align-items:stretch}
@@ -135,15 +140,7 @@ export function buildPanel(doc, bridge) {
     bodyInput.value = s.bodyTemplate;
     bodyInput.addEventListener('change', () => bridge.updateSettings({ bodyTemplate: bodyInput.value }));
 
-    const card = el(doc, 'div', { class: 'pb-card', id: CARD_ID }, [
-        el(doc, 'h4', {}, [
-            el(doc, 'span', { text: '🧩 第三方预填充桥接' }),
-            el(doc, 'button', {
-                class: 'pb-btn',
-                text: '刷新',
-                onclick: refresh,
-            }),
-        ]),
+    const body = el(doc, 'div', { class: 'pb-body', id: BODY_ID }, [
         el(doc, 'div', { class: 'pb-muted', text: '让 custom / 第三方 OpenAI 兼容渠道也能真正生效预填充（末尾 assistant 续写 + 展示补回）。' }),
         el(doc, 'div', { class: 'pb-row' }, [enabledInput, el(doc, 'span', { text: '启用插件' })]),
         el(doc, 'div', { class: 'pb-row pb-col' }, [el(doc, 'label', { text: '预填充来源' }), modeSelect]),
@@ -158,6 +155,32 @@ export function buildPanel(doc, bridge) {
         el(doc, 'div', { class: 'pb-row pb-col' }, [el(doc, 'label', { text: '检测到的候选' }), detected]),
         el(doc, 'div', { class: 'pb-row pb-col' }, [el(doc, 'label', { text: '诊断' }), diagPre]),
     ]);
+
+    // 折叠/展开（状态持久化在设置里，刷新页面后保持）
+    const caret = el(doc, 'span', { class: 'pb-caret', text: '▼' });
+    const setCollapsed = (collapsed, persist = true) => {
+        body.style.display = collapsed ? 'none' : 'flex';
+        caret.textContent = collapsed ? '▶' : '▼';
+        card.setAttribute('data-collapsed', collapsed ? 'true' : 'false');
+        if (persist) bridge.updateSettings({ panelCollapsed: collapsed });
+    };
+    const title = el(doc, 'span', {
+        class: 'pb-title',
+        title: '点击折叠 / 展开',
+        onclick: () => setCollapsed(!bridge.settings.panelCollapsed),
+    }, [caret, el(doc, 'span', { text: '🧩 第三方预填充桥接' })]);
+
+    const refreshBtn = el(doc, 'button', {
+        class: 'pb-btn',
+        text: '刷新',
+        onclick: (event) => {
+            event?.stopPropagation?.();
+            refresh();
+        },
+    });
+
+    const card = el(doc, 'div', { class: 'pb-card', id: CARD_ID }, [el(doc, 'h4', {}, [title, refreshBtn]), body]);
+    setCollapsed(Boolean(s.panelCollapsed), false);
     refresh();
     bridge.__refreshPanel = refresh;
     return card;

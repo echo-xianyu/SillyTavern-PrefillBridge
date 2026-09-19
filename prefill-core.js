@@ -101,6 +101,8 @@ export const DEFAULT_SETTINGS = Object.freeze({
     useImpersonationPrefill: false,
     /** 诊断：把每次请求的判定结果留在 bridge 状态里（面板可看） */
     diagnostics: true,
+    /** 面板是否折叠（点击标题切换，状态持久化） */
+    panelCollapsed: false,
     /**
      * 输出预算下限（0 = 不干预）。CommandCode 实测：v4.1-flash 是推理模型，
      * max_tokens 太小时 reasoning 会吃掉全部预算，content 回空串（finish_reason=length）。
@@ -149,6 +151,7 @@ export function normalizeSettings(raw) {
     out.injectBody = Boolean(out.injectBody);
     out.useImpersonationPrefill = Boolean(out.useImpersonationPrefill);
     out.diagnostics = Boolean(out.diagnostics);
+    out.panelCollapsed = Boolean(out.panelCollapsed);
     out.stripOnError = Boolean(out.stripOnError);
     out.warnOnEmptyContent = Boolean(out.warnOnEmptyContent);
     out.skipClaudeMessagesFormat = Boolean(out.skipClaudeMessagesFormat);
