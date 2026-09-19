@@ -1,0 +1,2 @@
+/* 第三方预填充桥接：样式由 panel.js 注入到宿主 document，这里只保留一个占位以保证
+   manifest 里声明的 css 存在（SillyTavern 与 TauriTavern 都会加载它）。 */

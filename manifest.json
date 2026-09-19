@@ -1,0 +1,14 @@
+{
+    "display_name": "第三方预填充桥接 / Prefill Bridge",
+    "loading_order": 60,
+    "requires": [],
+    "optional": [],
+    "js": "index.js",
+    "css": "style.css",
+    "author": "tavern-prefill",
+    "version": "1.0.0",
+    "homePage": "https://github.com/N0VI028/JS-Slash-Runner",
+    "auto_update": false,
+    "minimum_client_version": "1.12.13",
+    "i18n": {}
+}
